@@ -170,9 +170,9 @@ export class Hero extends Thing {
   findEnemyMissiles() ;
 
   /**
-   *
-   * @param {Thing[]} thing
-   * @returns {Thing}
+   * @template T
+   * @param {T[]} thing
+   * @returns {T}
    */
   findNearest(thing) ;
 
@@ -185,9 +185,15 @@ export class Hero extends Thing {
   /**
    * @param {Flag} flag
    */
-  pickUpFlag(flag) {
+  pickUpFlag(flag);
 
-  }
+  /**
+   *
+   * @param {Position} pos1
+   * @param {Position} pos2
+   * @returns {boolean}
+   */
+  isPathClear(pos1, pos2);
 }
 
 default export const hero = new Hero()

@@ -1,41 +1,63 @@
 import {hero} from "./definitions";
 
-export const arrayIncludes = (someArray, searchElement) => {
+const arrayIncludes = (someArray, searchElement) => {
   return someArray.filter(element => element === searchElement).length > 0;
 };
 
-export const numberOfEnemiesInCleaveRange = () => {
+const numberOfEnemiesInCleaveRange = () => {
   return hero.findEnemies().filter(enemy => hero.distanceTo(enemy) <= 5).length;
 };
 
-export const findPotions = () => hero.findItems().filter(
+const findPotions = () => hero.findItems().filter(
     it => it.type === "potion");
 
-export const isHealthBelow = healthInPercentage => (hero.health * 100
+const isHealthBelow = healthInPercentage => (hero.health * 100
         / hero.maxHealth)
     < healthInPercentage;
 
-export const tryHeal = () => {
-  let potions = findPotions();
+/** *
+ * @param {Position} [healPos]
+ */
+const tryHeal = (healPos) => {
+  const potions = findPotions();
+  const nearestPotion = hero.findNearest(potions);
 
-  if (potions.length && isHealthBelow(50)) {
-    let nearestPotion = hero.findNearest(potions);
+  if (isHealthBelow(50)) {
+    if (potions.length && healPos) {
 
-    hero.moveXY(nearestPotion.pos.x, nearestPotion.pos.y);
+      if (hero.distanceTo(nearestPotion) <= hero.distanceTo(healPos)) {
+        hero.moveXY(nearestPotion.pos.x, nearestPotion.pos.y);
+      } else {
+        while (isHealthBelow(90)) {
+          hero.moveXY(healPos.x, healPos.y);
+        }
+      }
+    } else if (healPos) {
+      while (isHealthBelow(90)) {
+        hero.moveXY(healPos.x, healPos.y);
+      }
+    } else if (potions.length) {
+      hero.moveXY(nearestPotion.pos.x, nearestPotion.pos.y);
+    }
   }
+
 };
 
-export const findMostValuableItem = () => {
+const findMostValuableItem = () => {
   hero.findItems().filter(it => it.value);
 };
 
-export const findNearestEnemySmart = () => {
+/**
+ *
+ * @returns {Enemy}
+ */
+const findNearestEnemySmart = () => {
   if (numberOfEnemiesInCleaveRange() > 1) {
     return hero.findNearestEnemy();
   }
 
-  hero.say(hero.findNearestEnemy().type);
   const enemies = hero.findEnemies()
+  .filter(it => hero.isPathClear(hero, it))
   .filter(it => it.type === "thrower");
 
   if (enemies.length > 0) {
@@ -43,27 +65,28 @@ export const findNearestEnemySmart = () => {
         (e1, e2) => hero.distanceTo(e1) <= hero.distanceTo(e2) ? e1 : e2);
   }
 
-  return hero.findNearestEnemy();
+  return hero.findNearest(hero.findEnemies()
+  .filter(it => hero.isPathClear(hero, it)));
 };
 
-export const attackAllFromNearest = () => {
+const attack = enemy => {
+  tryHeal();
+  if (numberOfEnemiesInCleaveRange() > 1 && hero.isReady("cleave")) {
+    hero.cleave(enemy);
+  } else {
+    hero.attack(enemy);
+  }
+};
+
+const attackAllFromNearest = () => {
   let enemy = findNearestEnemySmart();
   while (enemy) {
-    tryHeal();
-    if (numberOfEnemiesInCleaveRange() > 1 && hero.isReady("cleave")) {
-      hero.cleave(enemy);
-    } else {
-      if (hero.isReady("bash")) {
-        hero.bash(enemy);
-      } else {
-        hero.attack(enemy);
-      }
-    }
+    attack(enemy);
     enemy = hero.findNearestEnemy();
   }
 };
 
-export const getNearestMissile = () => {
+const getNearestMissile = () => {
   return hero.findNearest(hero.findEnemyMissiles());
 };
 
@@ -72,8 +95,24 @@ export const getNearestMissile = () => {
  * @param {number} maxRange
  * @returns {number}
  */
-export const missilesInRange = maxRange => {
-  let enemyMissiles = hero.findEnemyMissiles();
-  return enemyMissiles && enemyMissiles.filter(
+const missilesInRange = maxRange => {
+  return hero.findEnemyMissiles().filter(
       it => hero.distanceTo(it) <= maxRange).length;
+};
+
+const initialPosition = {x: hero.pos.x, y: hero.pos.y};
+
+module.exports = {
+  arrayIncludes,
+  numberOfEnemiesInCleaveRange,
+  findPotions,
+  isHealthBelow,
+  tryHeal,
+  findMostValuableItem,
+  findNearestEnemySmart,
+  attack,
+  attackAllFromNearest,
+  getNearestMissile,
+  missilesInRange,
+  initialPosition
 };
