@@ -1,26 +1,27 @@
 import {hero} from "./definitions";
 
-const arrayIncludes = (someArray, searchElement) => {
+export const arrayIncludes = (someArray, searchElement) => {
   return someArray.filter(element => element === searchElement).length > 0;
 };
 
-const numberOfEnemiesInCleaveRange = () => {
+export const numberOfEnemiesInCleaveRange = () => {
   return hero.findEnemies().filter(enemy => hero.distanceTo(enemy) <= 5).length;
 };
 
-const tryHeal  = () => {
+export const tryHeal = () => {
   let item = hero.findNearestItem();
 
-  if(item && item.type === "potion" && (hero.health *100/ hero.maxHealth) < 30){
+  if (item && item.type === "potion" && (hero.health * 100 / hero.maxHealth)
+      < 30) {
     hero.moveXY(item.pos.x, item.pos.y);
   }
 };
 
-const findMostValuableItem = () => {
-  hero.findItems().filter(it => it.value)
-}
+export const findMostValuableItem = () => {
+  hero.findItems().filter(it => it.value);
+};
 
-const findNearestEnemySmart = () => {
+export const findNearestEnemySmart = () => {
   if (numberOfEnemiesInCleaveRange() > 1) {
     return hero.findNearestEnemy();
   }
@@ -37,7 +38,7 @@ const findNearestEnemySmart = () => {
   return hero.findNearestEnemy();
 };
 
-const attackAllFromNearest = () => {
+export const attackAllFromNearest = () => {
   let enemy = findNearestEnemySmart();
   while (enemy) {
     tryHeal();
@@ -54,4 +55,17 @@ const attackAllFromNearest = () => {
   }
 };
 
-attackAllFromNearest();
+export const getNearestMissile = () => {
+  return hero.findNearest(hero.findEnemyMissiles());
+};
+
+/**
+ *
+ * @param {number} maxRange
+ * @returns {number}
+ */
+export const missilesInRange = maxRange => {
+  let enemyMissiles = hero.findEnemyMissiles();
+  return enemyMissiles && enemyMissiles.filter(
+      it => hero.distanceTo(it) <= maxRange).length;
+};

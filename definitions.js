@@ -16,22 +16,52 @@ export class Thing{
   pos
 }
 
-export class Enemy extends Thing{
+/**
+ * @typedef EnemyType
+ * @type {string | "thrower"}
+ */
+export class Enemy extends Thing {
   /**
-   * @type {string | "thrower"}
+   * @type {EnemyType}
    */
   type
 }
 
-export class Item extends Thing{
+/**
+ * @typedef MissleType
+ * @type {string | "arrow"}
+ */
+export class Missile extends Thing {
   /**
-   * @type {string | "potion" | "coin" | "gem"}
+   * @type {MissleType}
+   */
+  type
+}
+
+/**
+ * @typedef ItemType
+ * @type {string | "potion" | "coin" | "gem"}
+ */
+export class Item extends Thing {
+  /**
+   * @type {ItemType}
    */
   type
   /**
    * @type {number}
    */
   value
+}
+
+/**
+ * @typedef Color
+ * @type {"green"| "black" | "violet"}
+ */
+export class Flag extends Thing {
+  /**
+   * @type {Color}
+   */
+  color
 }
 
 export class Hero extends Thing {
@@ -127,6 +157,31 @@ export class Hero extends Thing {
    * @param enemy {Enemy}
    */
   attack(enemy);
+
+  /**
+   * @returns {Missile[]}
+   */
+  findEnemyMissiles() ;
+
+  /**
+   *
+   * @param {Thing[]} thing
+   * @returns {Thing}
+   */
+  findNearest(thing) ;
+
+  /**
+   * @param {Color} [color]
+   * @returns {Flag}
+   */
+  findFlag(color);
+
+  /**
+   * @param {Flag} flag
+   */
+  pickUpFlag(flag) {
+
+  }
 }
 
 default export const hero = new Hero()
