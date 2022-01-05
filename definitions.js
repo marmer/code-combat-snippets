@@ -104,6 +104,12 @@ export class Hero extends Thing {
   move(pos);
 
   /**
+   *
+   * @param {Thing} thing
+   */
+  jumpTo(thing);
+
+  /**
    * @returns {Item[]}
    */
   findItems();
@@ -115,7 +121,7 @@ export class Hero extends Thing {
 
   /**
    *
-   * @param {string} message
+   * @param {object | string} message
    */
   say(message);
 

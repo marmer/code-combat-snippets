@@ -8,12 +8,20 @@ export const numberOfEnemiesInCleaveRange = () => {
   return hero.findEnemies().filter(enemy => hero.distanceTo(enemy) <= 5).length;
 };
 
-export const tryHeal = () => {
-  let item = hero.findNearestItem();
+export const findPotions = () => hero.findItems().filter(
+    it => it.type === "potion");
 
-  if (item && item.type === "potion" && (hero.health * 100 / hero.maxHealth)
-      < 30) {
-    hero.moveXY(item.pos.x, item.pos.y);
+export const isHealthBelow = healthInPercentage => (hero.health * 100
+        / hero.maxHealth)
+    < healthInPercentage;
+
+export const tryHeal = () => {
+  let potions = findPotions();
+
+  if (potions.length && isHealthBelow(50)) {
+    let nearestPotion = hero.findNearest(potions);
+
+    hero.moveXY(nearestPotion.pos.x, nearestPotion.pos.y);
   }
 };
 
